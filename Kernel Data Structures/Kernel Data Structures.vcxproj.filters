@@ -27,9 +27,6 @@
     <ClCompile Include="TestDriver\TestDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kds_include\LinkedList.h">
@@ -38,7 +35,7 @@
     <ClInclude Include="kds_include\alloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vector.h">
+    <ClInclude Include="kds_include\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

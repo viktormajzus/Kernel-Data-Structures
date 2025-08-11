@@ -19,5 +19,16 @@ NTSTATUS DriverEntry(
     DbgPrint("List value: %d\n", value);
     });
 
+  list[5] = 7;
+  DbgPrint("BSOD: %d\n", list[5]);
+
   return STATUS_SUCCESS;
+}
+
+extern "C"
+void DriverUnload(_In_ PDRIVER_OBJECT DriverObject)
+{
+  UNREFERENCED_PARAMETER(DriverObject);
+
+  DbgPrint("Driver unloaded.\n");
 }

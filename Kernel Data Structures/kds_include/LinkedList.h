@@ -33,9 +33,11 @@ namespace kds
     Node* head{ nullptr };
     Node* tail{ nullptr };
     size_t size{};
+    kds::allocator<Node> alloc;
 
   public:
-    LinkedList()
+    explicit LinkedList(ULONG tag = 'KDLS', ULONG flags = POOL_FLAG_NON_PAGED)
+      : alloc(tag, flags)
     {
 
     }
@@ -43,6 +45,42 @@ namespace kds
     {
       clear();
     }
+
+    LinkedList(const LinkedList& other)
+      : head{ nullptr }, tail{ nullptr }, size{ 0 }
+    {
+      for (Node* current = other.head; current; current = current->next)
+        push_back(current->data);
+    }
+
+    LinkedList& operator=(const LinkedList& other)
+    {
+      if (this == &other)
+        return *this;
+
+      clear();
+      for (Node* current = other.head; current; current = current->next)
+        push_back(current->data);
+
+      return *this;
+    }
+
+    LinkedList(LinkedList&& other) noexcept
+      : head(other.head), tail(other.tail), size(other.size)
+    {
+      other.head = other.tail = nullptr;
+      other.size = 0;
+    }
+
+    LinkedList& operator=(LinkedList&& other) noexcept
+    {
+      if (this == &other) return *this;
+      clear();
+      head = other.head; tail = other.tail; size = other.size;
+      other.head = other.tail = nullptr; other.size = 0;
+      return *this;
+    }
+
 
     template<typename Func>
     void for_each_forward(Func&& func)
@@ -99,12 +137,17 @@ namespace kds
     /// Out of bounds will result in BSOD
     T& operator[](size_t index)
     {
+      NT_ASSERT(index < getSize());
+
       return *this->at(index);
     }
 
     void push_front(const T& value)
     {
-      Node* ptr{ static_cast<Node*>(operator new(sizeof(Node))) };
+      Node* ptr{ alloc.allocate(1) };
+      if (!ptr)
+        return;
+
       new(ptr) Node(value);
 
       ptr->next = head;
@@ -120,9 +163,9 @@ namespace kds
     }
     void push_back(const T& value)
     {
-      Node* ptr{ static_cast<Node*>(operator new(sizeof(Node))) };
+      Node* ptr{ alloc.allocate(1) };
       new(ptr) Node(value);
-
+      ptr->next = nullptr;
       ptr->prev = tail;
 
       if (tail)
@@ -152,7 +195,7 @@ namespace kds
       }
 
       current->~Node();
-      operator delete(current);
+      alloc.deallocate(current, 1);
       --size;
     }
 
@@ -174,30 +217,38 @@ namespace kds
       }
 
       current->~Node();
-      operator delete(current);
+      alloc.deallocate(current, 1);
       --size;
     }
 
     T* front()
     {
-      return (head ? head->data : nullptr);
+      return (head ? &head->data : nullptr);
     }
     T* back()
     {
-      return (tail ? tail->data : nullptr);
+      return (tail ? &tail->data : nullptr);
     }
 
     const T* front() const
     {
-      return (head ? head->data : nullptr);
+      return (head ? &head->data : nullptr);
     }
     const T* back() const
     {
-      return (tail ? tail->data : nullptr);
+      return (tail ? &tail->data : nullptr);
     }
 
-    void clear()
+    void clear() noexcept
     {
+      if (!tail)
+      {
+        head = nullptr;
+        size = 0;
+
+        return;
+      }
+
       Node* current{ tail };
       while (current)
       {
@@ -205,7 +256,7 @@ namespace kds
         current = current->prev;
 
         temp->~Node();
-        operator delete(temp);
+        alloc.deallocate(temp, 1);
       }
 
       head = nullptr;
@@ -213,12 +264,12 @@ namespace kds
       size = 0;
     }
 
-    bool empty()
+    bool empty() const
     {
       return size == 0;
     }
 
-    size_t getSize()
+    size_t getSize() const
     {
       return size;
     }
