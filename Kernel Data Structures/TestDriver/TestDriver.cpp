@@ -1,6 +1,6 @@
 #include <ntddk.h>
 
-#include "../kds_include/LinkedList.h"
+#include "../kds_include/LinkedList.hpp"
 
 extern "C"
 NTSTATUS DriverEntry(

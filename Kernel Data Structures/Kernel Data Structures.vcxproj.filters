@@ -29,13 +29,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="kds_include\LinkedList.h">
+    <ClInclude Include="kds_include\LinkedList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kds_include\alloc.h">
+    <ClInclude Include="kds_include\alloc.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kds_include\vector.h">
+    <ClInclude Include="kds_include\vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
